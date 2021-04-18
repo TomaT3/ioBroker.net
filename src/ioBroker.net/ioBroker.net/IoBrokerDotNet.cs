@@ -10,15 +10,14 @@ namespace ioBroker.net
 {
     public class IoBrokerDotNet : IIoBrokerDotNet
     {
-        private readonly Uri _connectionUri;
         private readonly SocketIO _socketIoClient;
         private EventWaitHandle _connectedWaitHandle;
         private readonly Dictionary<string, List<Action<State>>> _subscriptions;
 
         public IoBrokerDotNet(string url)
         {
-            _connectionUri = new Uri(url);
-            _socketIoClient = new SocketIO(_connectionUri);
+            var connectionUri = new Uri(url);
+            _socketIoClient = new SocketIO(connectionUri);
             _subscriptions = new Dictionary<string, List<Action<State>>>();
         }
 
@@ -30,7 +29,6 @@ namespace ioBroker.net
 
             _connectedWaitHandle.WaitOne(timeout);
         }
-
 
         public async Task SetStateAsync<T>(string id, T value)
         {
