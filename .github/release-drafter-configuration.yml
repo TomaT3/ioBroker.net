@@ -36,6 +36,6 @@ version-resolver:
     labels:
       - 'bug'
       - 'refactoring'
-      - 'docs'
+      - 'documentation'
       - 'dependencies'
   default: patch
