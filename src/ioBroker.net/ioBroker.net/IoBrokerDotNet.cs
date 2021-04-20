@@ -32,7 +32,7 @@ namespace ioBroker.net
 
         public async Task SetStateAsync<T>(string id, T value)
         {
-            await _socketIoClient.EmitAsync("setState", id, new State() { Val = value, Ack = false });
+            await _socketIoClient.EmitAsync("setState", id, new { val = value, ack = false });
         }
 
         public async Task<T> GetStateAsync<T>(string id, TimeSpan timeout)
