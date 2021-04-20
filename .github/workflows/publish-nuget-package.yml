@@ -24,6 +24,9 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       
+      - uses: olegtarasov/get-tag@v2.1
+        id: tagName
+      
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
@@ -33,3 +36,5 @@ jobs:
         with:
           # Filepath of the project to be packaged, relative to root of repository
           PROJECT_FILE_PATH: src/ioBroker.net/ioBroker.net/ioBroker.net.csproj
+          VERSION_STATIC: tagName
+          TAG_FORMAT: v*
