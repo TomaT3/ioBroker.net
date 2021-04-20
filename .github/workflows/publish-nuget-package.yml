@@ -34,8 +34,8 @@ jobs:
           string: '${{ steps.tagName.outputs.tag }}'
           replace-with: '$1'
       
-      - name: echo version nmumber
-        run: echo version number ${{ steps.versionNumber.outputs.replaced }}
+      - name: echo version number
+        run: echo "version number ${{ steps.verionNumber.outputs.replaced }}"
       
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
@@ -46,5 +46,6 @@ jobs:
         with:
           # Filepath of the project to be packaged, relative to root of repository
           PROJECT_FILE_PATH: src/ioBroker.net/ioBroker.net/ioBroker.net.csproj
+          VERSION_STATIC: ${{ steps.verionNumber.outputs.replaced }}
           TAG_FORMAT: v*
           NUGET_KEY: ${{secrets.NUGET_KEY}}
