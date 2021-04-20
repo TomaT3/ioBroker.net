@@ -27,6 +27,13 @@ jobs:
       - uses: olegtarasov/get-tag@v2.1
         id: tagName
       
+      - uses: frabert/replace-string-action@v1.2
+        id: verionNumber
+        with:
+          pattern: '(\d+.\d+.\d+)'
+          string: '${{ steps.tagName.outputs.tag }}'
+          replace-with: '$1'
+      
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
@@ -36,5 +43,5 @@ jobs:
         with:
           # Filepath of the project to be packaged, relative to root of repository
           PROJECT_FILE_PATH: src/ioBroker.net/ioBroker.net/ioBroker.net.csproj
-          VERSION_STATIC: ${{ steps.tagName.outputs.tag }}
-          TAG_FORMAT: v*
+          VERSION_STATIC: ${{ steps.versionNumber.outputs.replaced }}
+          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
