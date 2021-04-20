@@ -17,7 +17,7 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
-  build:
+  publish:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
     
@@ -46,5 +46,5 @@ jobs:
         with:
           # Filepath of the project to be packaged, relative to root of repository
           PROJECT_FILE_PATH: src/ioBroker.net/ioBroker.net/ioBroker.net.csproj
-          VERSION_STATIC: 0.0.5
-          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+          TAG_FORMAT: v*
+          NUGET_KEY: ${{secrets.NUGET_KEY}}
