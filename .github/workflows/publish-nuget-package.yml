@@ -32,6 +32,11 @@ jobs:
       - name: echo version number
         run: echo "version number ${{ steps.vars.outputs.tag }}"
 
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.x
+        
       - name: publish on version change
         id: publish_nuget
         uses: Rebel028/publish-nuget@2.6.1
