@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -9,6 +9,7 @@
     <PackageIcon>ioBrokerIcon.png</PackageIcon>
     <RepositoryUrl>https://github.com/TomaT3/ioBroker.net</RepositoryUrl>
     <PackageTags>ioBroker socket communication .net</PackageTags>
+    <Version>0.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
