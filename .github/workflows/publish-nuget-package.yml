@@ -45,4 +45,5 @@ jobs:
           PROJECT_FILE_PATH: src/ioBroker.net/ioBroker.net/ioBroker.net.csproj
           VERSION_STATIC: 0.0.9
           NUGET_SOURCE: https://api.nuget.org
+          TAG_COMMIT: false
           NUGET_KEY: ${{secrets.NUGET_KEY}}
