@@ -18,8 +18,8 @@ jobs:
       with:
         dotnet-version: 5.0.x
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore ./src/ioBroker.net/ioBroker.net/ioBroker.net.csproj
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build ./src/ioBroker.net/ioBroker.net/ioBroker.net.csproj --no-restore 
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test ./src/ioBroker.net/ioBroker.net.sln --no-build --verbosity normal
