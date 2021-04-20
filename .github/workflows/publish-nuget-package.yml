@@ -34,8 +34,8 @@ jobs:
           string: '${{ steps.tagName.outputs.tag }}'
           replace-with: '$1'
       
-      - name: echo verison
-        run: version number ${{ steps.versionNumber.outputs.replaced }}
+      - name: echo version nmumber
+        run: echo version number ${{ steps.versionNumber.outputs.replaced }}
       
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
