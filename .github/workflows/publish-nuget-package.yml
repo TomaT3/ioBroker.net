@@ -36,14 +36,11 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 5.0.x
-        
-      - name: publish on version change
-        id: publish_nuget
-        uses: Rebel028/publish-nuget@2.6.1
-        with:
-          # Filepath of the project to be packaged, relative to root of repository
-          PROJECT_FILE_PATH: src/ioBroker.net/ioBroker.net/ioBroker.net.csproj
-          VERSION_STATIC: 0.0.9
-          NUGET_SOURCE: https://api.nuget.org
-          TAG_COMMIT: false
-          NUGET_KEY: ${{secrets.NUGET_KEY}}
+          source-url: https://api.nuget.org/v3/index.json
+        env:
+          NUGET_AUTH_TOKEN: ${{secrets.NUGET_KEY}}
+       
+      - name: Build 
+        run: dotnet build src/ioBroker.net/ioBroker.net/ioBroker.net.csproj --configuration Release -p:Version=${{steps.vars.outputs.tag}} 
+      - name: Publish the package to GPR
+        run: dotnet nuget push src/ioBroker.net/ioBroker.net/bin/Release/*.nupkg
