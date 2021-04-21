@@ -10,6 +10,7 @@
     <RepositoryUrl>https://github.com/TomaT3/ioBroker.net</RepositoryUrl>
     <PackageTags>ioBroker socket communication .net</PackageTags>
     <Version>0.0.1</Version>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
