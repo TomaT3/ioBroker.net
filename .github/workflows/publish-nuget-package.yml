@@ -36,6 +36,8 @@ jobs:
         with:
           dotnet-version: 5.0.x
           source-url: https://api.nuget.org/v3/index.json
+        env:
+          NUGET_AUTH_TOKEN: ${{secrets.NUGET_KEY}}
        
       - name: Build 
         run: dotnet build src/ioBroker.net/ioBroker.net/ioBroker.net.csproj --configuration Release -p:Version=${{ steps.get_version.outputs.version-without-v }}
