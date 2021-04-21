@@ -25,12 +25,11 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-      - name: Set verion
-        id: vars
-        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
       
-      - name: echo version number
-        run: echo "version number ${{ steps.vars.outputs.tag }}"
+      - id: get_version
+        uses: battila7/get-version-action@v  
+
+      - run: echo "Publish version v${{ steps.get_version.outputs.version-without-v }}"
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
@@ -41,6 +40,6 @@ jobs:
           NUGET_AUTH_TOKEN: ${{secrets.NUGET_KEY}}
        
       - name: Build 
-        run: dotnet build src/ioBroker.net/ioBroker.net/ioBroker.net.csproj --configuration Release -p:Version=${{steps.vars.outputs.tag}} 
+        run: dotnet build src/ioBroker.net/ioBroker.net/ioBroker.net.csproj --configuration Release -p:Version=${{ steps.get_version.outputs.version-without-v }}
       - name: Publish the package to GPR
         run: dotnet nuget push src/ioBroker.net/ioBroker.net/bin/Release/*.nupkg
