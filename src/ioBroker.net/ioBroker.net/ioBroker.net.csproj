@@ -7,6 +7,8 @@
     <Company></Company>
     <PackageProjectUrl>https://github.com/TomaT3/ioBroker.net</PackageProjectUrl>
     <PackageIcon>ioBrokerIcon.png</PackageIcon>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/tomat3/iobroker.net/master/LICENSE</PackageLicenseUrl>
     <RepositoryUrl>https://github.com/TomaT3/ioBroker.net</RepositoryUrl>
     <PackageTags>ioBroker socket communication .net</PackageTags>
     <Version>0.0.1</Version>
