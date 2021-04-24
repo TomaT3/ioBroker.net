@@ -7,7 +7,7 @@ Enables easy communication with ioBroker for .NET Projects
 
 ## Usage
 
-Install NugetPackage ioBroker.net
+Install NugetPackage ioBroker.net from [nuget.org](https://www.nuget.org/packages/ioBroker.net/)
 
 ### Create connection to socket.io adapter in ioBroker
 ```c#
