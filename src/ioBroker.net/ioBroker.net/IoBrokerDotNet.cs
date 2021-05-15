@@ -35,6 +35,19 @@ namespace ioBroker.net
             await _socketIoClient.EmitAsync("setState", id, new { val = value, ack = false });
         }
 
+        //public async Task CreateStateAsync<T>(string id)
+        //{
+        //    await _socketIoClient.EmitAsync("createState", id, false,
+        //        new
+        //        {
+        //            read = true,
+        //            write = true,
+        //            name = "Das ist ein Test",
+        //            type = "boolean",
+        //            def = false
+        //        });
+        //}
+
         public async Task<T> GetStateAsync<T>(string id, TimeSpan timeout)
         {
             T retVal = default(T);

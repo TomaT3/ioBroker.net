@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31112.23
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ioBroker.net", "ioBroker.net\ioBroker.net.csproj", "{45E6BEB5-937B-4525-BBDA-6FE59642F0D4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ioBroker.net", "ioBroker.net\ioBroker.net.csproj", "{45E6BEB5-937B-4525-BBDA-6FE59642F0D4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleTest", "ConsoleTest\ConsoleTest.csproj", "{BDC0E962-F3D9-4275-88D9-6120C8785FB4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{45E6BEB5-937B-4525-BBDA-6FE59642F0D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{45E6BEB5-937B-4525-BBDA-6FE59642F0D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{45E6BEB5-937B-4525-BBDA-6FE59642F0D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BDC0E962-F3D9-4275-88D9-6120C8785FB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BDC0E962-F3D9-4275-88D9-6120C8785FB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BDC0E962-F3D9-4275-88D9-6120C8785FB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BDC0E962-F3D9-4275-88D9-6120C8785FB4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
