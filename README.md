@@ -16,11 +16,30 @@ using using ioBroker.net;
 var ioBroker = new IoBrokerDotNet("http://iobroker:8084");
 await ioBroker.ConnectAsync(TimeSpan.FromSeconds(5));
 ```
+or use empty constructor and set ConnectionString before connecting
+```c#
+using using ioBroker.net;
+...
+var ioBroker = new IoBrokerDotNet();
+ioBroker.ConnectionString = "http://ioBroker:8084";
+await ioBroker.ConnectAsync(TimeSpan.FromSeconds(5));
+```
 
 ### Read value
 ```c#
 var id = "deconz.0.Lights.13.level"; // the object id you want to read
-var lightLevel = await ioBroker.GetStateAsync<int>(id, TimeSpan.FromSeconds(5));
+var result = await ioBroker.GetStateAsync<int>(id, TimeSpan.FromSeconds(5)); // you receive a GetStateResult<T>
+
+// Check if reading was succesfull
+if (result.Success)
+{
+    Console.WriteLine($"Success with value: {result.Value}");
+}
+else
+{
+    Console.WriteLine($"Error with Exception: {result.Error}");
+}
+
 ```
 
 ### Write value

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ioBroker.net.Extensions;
@@ -14,17 +15,34 @@ namespace ioBroker.net
         private EventWaitHandle _connectedWaitHandle;
         private readonly Dictionary<string, List<Action<State>>> _subscriptions;
 
-        public IoBrokerDotNet(string url)
+        private SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 1);
+
+
+        public IoBrokerDotNet()
         {
-            var connectionUri = new Uri(url);
-            _socketIoClient = new SocketIO(connectionUri);
+            _socketIoClient = new SocketIO();
+            _socketIoClient.OnConnected += async (sender, eventArgs) => await SocketIoOnConnectedHandler(sender, eventArgs);
+            _socketIoClient.OnDisconnected += (sender, s) => { Console.WriteLine($"Disonnected from socket.io: {s}"); };
+            _socketIoClient.OnError += (sender, s) => { Console.WriteLine($"Error from socket.io: {s}"); };
+            _socketIoClient.OnReconnecting += (sender, i) => { Console.WriteLine($"Reconnecting: {i}"); };
+            _socketIoClient.OnReconnectFailed += (sender, exception) => { Console.WriteLine($"Reconnect failed: {exception}"); };
+
             _subscriptions = new Dictionary<string, List<Action<State>>>();
         }
 
+        public IoBrokerDotNet(string connectionString) : base()
+        {
+            ConnectionString = connectionString;
+        }
+
+        public string ConnectionString { get; set; }
+
         public async Task ConnectAsync(TimeSpan timeout)
         {
+            var connectionUri = new Uri(ConnectionString);
+            _socketIoClient.ServerUri = connectionUri;
+
             _connectedWaitHandle = new EventWaitHandle(false, EventResetMode.ManualReset);
-            _socketIoClient.OnConnected += _socketIoClient_OnConnected;
             await _socketIoClient.ConnectAsync();
 
             _connectedWaitHandle.WaitOne(timeout);
@@ -35,26 +53,17 @@ namespace ioBroker.net
             await _socketIoClient.EmitAsync("setState", id, new { val = value, ack = false });
         }
 
-        //public async Task CreateStateAsync<T>(string id)
-        //{
-        //    await _socketIoClient.EmitAsync("createState", id, false,
-        //        new
-        //        {
-        //            read = true,
-        //            write = true,
-        //            name = "Das ist ein Test",
-        //            type = "boolean",
-        //            def = false
-        //        });
-        //}
-
-        public async Task<T> GetStateAsync<T>(string id, TimeSpan timeout)
+        public async Task<GetStateResult<T>> GetStateAsync<T>(string id, TimeSpan timeout)
         {
-            T retVal = default(T);
+            var retVal = new GetStateResult<T>();
             var stateReceivedWaitHandle = new EventWaitHandle(false, EventResetMode.ManualReset);
-            await _socketIoClient.EmitAsync("getState", (response) => GetStateResponse<T>(response, stateReceivedWaitHandle, out retVal), id);
+            await _socketIoClient.EmitAsync("getState", (response) => GetStateResponse<T>(response, stateReceivedWaitHandle, retVal, id), id);
 
-            stateReceivedWaitHandle.WaitOne(timeout);
+            if (!stateReceivedWaitHandle.WaitOne(timeout))
+            {
+                retVal.Success = false;
+                retVal.Error = new TimeoutException($"Timeout for reading state of id: \"{id}\"");
+            }
             stateReceivedWaitHandle.Dispose();
 
             return retVal;
@@ -62,32 +71,79 @@ namespace ioBroker.net
 
         public async Task SubscribeStateAsync<T>(string id, Action<T> callback)
         {
-            var cb = new Action<State>((state) => callback(state.Val.ConvertTo<T>()));
+            var cb = new Action<State>((state) => callback(JsonSerializer.Deserialize<T>(state.Val.ToString())));
 
-            if (_subscriptions.TryGetValue(id, out var callbacks))
+            await semaphoreSlim.WaitAsync();
+            try
             {
-                callbacks.Add(cb);
+                if (_subscriptions.TryGetValue(id, out var callbacks))
+                {
+                    callbacks.Add(cb);
+                }
+                else
+                {
+                    callbacks = new List<Action<State>>();
+                    callbacks.Add(cb);
+                    _subscriptions.Add(id, callbacks);
+                    await _socketIoClient.EmitAsync("subscribe", id);
+                }
             }
-            else
+            finally
             {
-                callbacks = new List<Action<State>>();
-                callbacks.Add(cb);
-                _subscriptions.Add(id, callbacks);
-                await _socketIoClient.EmitAsync("subscribe", id);
+                semaphoreSlim.Release();
             }
+            
         }
 
-        private void _socketIoClient_OnConnected(object sender, EventArgs e)
+        private async Task SocketIoOnConnectedHandler(object sender, EventArgs e)
         {
+            Console.WriteLine($"Connected succesully to socket.io");
+            Console.WriteLine($"Register for state changes");
             _socketIoClient.On("stateChange", HandleStateChanged);
+            await SubscribeAllIds();
             _connectedWaitHandle.Set();
         }
 
-        private void GetStateResponse<T>(SocketIOResponse response, EventWaitHandle stateReceivedWaitHandle, out T value)
+        private async Task SubscribeAllIds()
+        {
+            await semaphoreSlim.WaitAsync();
+            try
+            {
+                foreach (var subscription in _subscriptions)
+                {
+                    Console.WriteLine($"Subscribe to {subscription.Key}");
+                    await _socketIoClient.EmitAsync("subscribe", subscription.Key);
+                }
+            }
+            finally
+            {
+                semaphoreSlim.Release();
+            }
+        }
+
+        private void GetStateResponse<T>(SocketIOResponse response, EventWaitHandle stateReceivedWaitHandle, GetStateResult<T> stateResult, string id)
         {
             var topic = response.GetValue<string>();
             var obj = response.GetValue<State>(1);
-            value = obj.Val.ConvertTo<T>();
+            if (obj != null)
+            {
+                try
+                {
+                    stateResult.Value= JsonSerializer.Deserialize<T>(obj.Val.ToString());
+                    stateResult.Success = true;
+                }
+                catch (Exception e)
+                {
+                    stateResult.Success = false;
+                    stateResult.Error = e;
+                }
+            }
+            else
+            {
+                stateResult.Success = false;
+                stateResult.Error = new Exception($"Id: \"{id}\" not found");
+            }
+
             stateReceivedWaitHandle.Set();
         }
 

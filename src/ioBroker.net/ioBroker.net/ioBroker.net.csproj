@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SocketIOClient" Version="2.1.7" />
+    <PackageReference Include="SocketIOClient" Version="2.2.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,6 +24,10 @@
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Model\Public\" />
   </ItemGroup>
 
 </Project>
