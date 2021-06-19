@@ -1,6 +1,8 @@
 # ioBroker.net
 Enables easy communication with ioBroker for .NET Projects
 
+[Release Notes](https://github.com/TomaT3/ioBroker.net/releases)
+
 ## Preconditions
 
 - Installed [socket.io](https://github.com/ioBroker/ioBroker.socketio/) adapter in ioBroker
