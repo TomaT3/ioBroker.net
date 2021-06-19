@@ -30,7 +30,7 @@ namespace ioBroker.net
             _subscriptions = new Dictionary<string, List<Action<State>>>();
         }
 
-        public IoBrokerDotNet(string connectionString) : base()
+        public IoBrokerDotNet(string connectionString) : this()
         {
             ConnectionString = connectionString;
         }
