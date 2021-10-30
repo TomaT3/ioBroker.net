@@ -11,7 +11,7 @@ namespace ioBroker.net
 {
     public class IoBrokerDotNet : IIoBrokerDotNet
     {
-        private readonly SocketIO _socketIoClient;
+        private SocketIO _socketIoClient;
         private EventWaitHandle _connectedWaitHandle;
         private readonly Dictionary<string, List<Action<State>>> _subscriptions;
 
@@ -20,13 +20,6 @@ namespace ioBroker.net
 
         public IoBrokerDotNet()
         {
-            _socketIoClient = new SocketIO();
-            _socketIoClient.OnConnected += async (sender, eventArgs) => await SocketIoOnConnectedHandler(sender, eventArgs);
-            _socketIoClient.OnDisconnected += (sender, s) => { Console.WriteLine($"Disonnected from socket.io: {s}"); };
-            _socketIoClient.OnError += (sender, s) => { Console.WriteLine($"Error from socket.io: {s}"); };
-            _socketIoClient.OnReconnecting += (sender, i) => { Console.WriteLine($"Reconnecting: {i}"); };
-            _socketIoClient.OnReconnectFailed += (sender, exception) => { Console.WriteLine($"Reconnect failed: {exception}"); };
-
             _subscriptions = new Dictionary<string, List<Action<State>>>();
         }
 
@@ -35,12 +28,24 @@ namespace ioBroker.net
             ConnectionString = connectionString;
         }
 
+        private void CreateSocketIoClient()
+        {
+            var connectionUri = new Uri(ConnectionString);
+            //_socketIoClient.ServerUri = connectionUri;
+
+            _socketIoClient = new SocketIO(connectionUri, new SocketIOOptions() { EIO = 3, ConnectionTimeout = TimeSpan.MaxValue });
+            _socketIoClient.OnConnected += async (sender, eventArgs) => await SocketIoOnConnectedHandler(sender, eventArgs);
+            _socketIoClient.OnDisconnected += (sender, s) => { Console.WriteLine($"Disonnected from socket.io: {s}"); };
+            _socketIoClient.OnError += (sender, s) => { Console.WriteLine($"Error from socket.io: {s}"); };
+            _socketIoClient.OnReconnectAttempt += (sender, i) => { Console.WriteLine($"Reconnecting: {i}"); };
+            _socketIoClient.OnReconnectFailed += (sender, exception) => { Console.WriteLine($"Reconnect failed: {exception}"); };
+        }
+
         public string ConnectionString { get; set; }
 
         public async Task ConnectAsync(TimeSpan timeout)
         {
-            var connectionUri = new Uri(ConnectionString);
-            _socketIoClient.ServerUri = connectionUri;
+            CreateSocketIoClient();
 
             _connectedWaitHandle = new EventWaitHandle(false, EventResetMode.ManualReset);
             await _socketIoClient.ConnectAsync();
@@ -129,7 +134,7 @@ namespace ioBroker.net
             {
                 try
                 {
-                    stateResult.Value= JsonSerializer.Deserialize<T>(obj.Val.ToString());
+                    stateResult.Value= JsonSerializer.Deserialize<T>(obj.Val.ToString().ToLower());
                     stateResult.Success = true;
                 }
                 catch (Exception e)

@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SocketIOClient" Version="2.2.0" />
+    <PackageReference Include="SocketIOClient" Version="3.0.3" />
   </ItemGroup>
 
   <ItemGroup>
