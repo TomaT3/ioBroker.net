@@ -15,7 +15,7 @@ namespace ConsoleTest
             await ioBroker.ConnectAsync(TimeSpan.FromSeconds(5));
 
             var tempCountId = "javascript.0.socketio.0.Test_12345";
-            var tempCount = ioBroker.GetStateAsync<bool>(tempCountId, TimeSpan.FromSeconds(5)).Result;
+            var tempCount = ioBroker.TryGetStateAsync<bool>(tempCountId, TimeSpan.FromSeconds(5)).Result;
             //var newValue = false;
             //await ioBroker.SetStateAsync<bool>(tempCountId, newValue);
 
@@ -33,12 +33,36 @@ namespace ConsoleTest
             //}
             ////await ioBroker.CreateStateAsync<int>("javascript.0.toilett.flushes");
 
-            Thread.Sleep(TimeSpan.FromMinutes(5));
-            var newValue = false;
-            await ioBroker.SetStateAsync<bool>(tempCountId, newValue);
+            await TryWriteAndRead(ioBroker, tempCountId);
+            await TryWriteAndRead(ioBroker, tempCountId);
+
             Console.ReadKey();
         }
 
-        
+        private static async Task TryWriteAndRead(IoBrokerDotNet ioBroker, string tempCountId)
+        {
+            Thread.Sleep(TimeSpan.FromSeconds(30));
+            var newValue = false;
+            var result = await ioBroker.TrySetStateAsync<bool>(tempCountId, newValue);
+            if (result.Success)
+            {
+                Console.WriteLine($"result: {result.Success}");
+            }
+            else
+            {
+                Console.WriteLine($"Error while writing: {result.Error}");
+            }
+
+            var resultWithoutConnection = ioBroker.TryGetStateAsync<bool>(tempCountId, TimeSpan.FromSeconds(5)).Result;
+            if (resultWithoutConnection.Success)
+            {
+                Console.WriteLine($"result: {resultWithoutConnection.Value}");
+            }
+            else
+            {
+                Console.WriteLine($"Error while Reading: {resultWithoutConnection.Error}");
+            }
+        }
+
     }
 }

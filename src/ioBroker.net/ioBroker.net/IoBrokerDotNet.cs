@@ -33,7 +33,7 @@ namespace ioBroker.net
             var connectionUri = new Uri(ConnectionString);
             //_socketIoClient.ServerUri = connectionUri;
 
-            _socketIoClient = new SocketIO(connectionUri, new SocketIOOptions() { EIO = 3, ConnectionTimeout = TimeSpan.MaxValue });
+            _socketIoClient = new SocketIO(connectionUri, new SocketIOOptions() { EIO = 3, ConnectionTimeout = TimeSpan.FromDays(1) });
             _socketIoClient.OnConnected += async (sender, eventArgs) => await SocketIoOnConnectedHandler(sender, eventArgs);
             _socketIoClient.OnDisconnected += (sender, s) => { Console.WriteLine($"Disonnected from socket.io: {s}"); };
             _socketIoClient.OnError += (sender, s) => { Console.WriteLine($"Error from socket.io: {s}"); };
@@ -53,23 +53,53 @@ namespace ioBroker.net
             _connectedWaitHandle.WaitOne(timeout);
         }
 
-        public async Task SetStateAsync<T>(string id, T value)
+        public async Task<SetStateResult> TrySetStateAsync<T>(string id, T value)
         {
-            await _socketIoClient.EmitAsync("setState", id, new { val = value, ack = false });
+            var result = new SetStateResult() { Success = true };
+            try
+            {
+                if (_socketIoClient.Connected)
+                {
+                    await _socketIoClient.EmitAsync("setState", id, new { val = value, ack = false });
+                }
+                else
+                {
+                    result.Success = false;
+                    result.Error = new Exception($"Not connected to socket io server {ConnectionString}");
+                }
+            }
+            catch(Exception exception)
+            {
+                Console.WriteLine(exception);
+                result.Success = false;
+                result.Error = exception;
+            }
+
+            return result;
         }
 
-        public async Task<GetStateResult<T>> GetStateAsync<T>(string id, TimeSpan timeout)
+        public async Task<GetStateResult<T>> TryGetStateAsync<T>(string id, TimeSpan timeout)
         {
             var retVal = new GetStateResult<T>();
             var stateReceivedWaitHandle = new EventWaitHandle(false, EventResetMode.ManualReset);
-            await _socketIoClient.EmitAsync("getState", (response) => GetStateResponse<T>(response, stateReceivedWaitHandle, retVal, id), id);
-
-            if (!stateReceivedWaitHandle.WaitOne(timeout))
+            try
+            {
+                await _socketIoClient.EmitAsync("getState", (response) => GetStateResponse<T>(response, stateReceivedWaitHandle, retVal, id), id);
+                if (!stateReceivedWaitHandle.WaitOne(timeout))
+                {
+                    retVal.Success = false;
+                    retVal.Error = new TimeoutException($"Timeout for reading state of id: \"{id}\"");
+                }
+            }
+            catch (Exception exception)
             {
                 retVal.Success = false;
-                retVal.Error = new TimeoutException($"Timeout for reading state of id: \"{id}\"");
+                retVal.Error = exception;
             }
-            stateReceivedWaitHandle.Dispose();
+            finally
+            {
+                stateReceivedWaitHandle.Dispose();
+            }
 
             return retVal;
         }
