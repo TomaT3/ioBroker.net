@@ -28,7 +28,7 @@ await ioBroker.ConnectAsync(TimeSpan.FromSeconds(5));
 ### Read value
 ```c#
 var id = "deconz.0.Lights.13.level"; // the object id you want to read
-var result = await ioBroker.GetStateAsync<int>(id, TimeSpan.FromSeconds(5)); // you receive a GetStateResult<T>
+var result = await ioBroker.TryGetStateAsync<int>(id, TimeSpan.FromSeconds(5)); // you receive a GetStateResult<T>
 
 // Check if reading was succesfull
 if (result.Success)
@@ -45,14 +45,22 @@ else
 ### Write value
 ```c#
 var id = "deconz.0.Lights.13.level"; // the object id you want to set
-await ioBroker.SetStateAsync<int>(id, 55);
+var result = await ioBroker.TrySetStateAsync<int>(id, 55); // you receive a SetStateResult<T>
+// Check if writing was succesfull
+if (result.Success)
+{
+    Console.WriteLine($"Success with writing value: {result.ValueToWrite}");
+}
+else
+{
+    Console.WriteLine($"Error while writing with Exception: {result.Error}");
+}
 ```
 
 ### Subscribe for changes
 ```c#
 var id = "deconz.0.Lights.13.level"; // the object id you want to get notifications if value changes
 await ioBroker.SubscribeStateAsync<int>(id, LightLevelChangedHandler);
-
 ...
 
 private static void LightLevelChangedHandler(int lightLevel)

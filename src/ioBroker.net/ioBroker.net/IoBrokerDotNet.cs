@@ -53,9 +53,9 @@ namespace ioBroker.net
             _connectedWaitHandle.WaitOne(timeout);
         }
 
-        public async Task<SetStateResult> TrySetStateAsync<T>(string id, T value)
+        public async Task<SetStateResult<T>> TrySetStateAsync<T>(string id, T value)
         {
-            var result = new SetStateResult() { Success = true };
+            var result = new SetStateResult<T>() { Success = true, ValueToWrite = value };
             try
             {
                 if (_socketIoClient.Connected)
