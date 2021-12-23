@@ -78,6 +78,11 @@ namespace ioBroker.net
             return result;
         }
 
+        public async Task<GetStateResult<T>> TryGetStateAsync<T>(string id)
+        {
+            return await TryGetStateAsync<T>(id, TimeSpan.FromSeconds(5));
+        }
+
         public async Task<GetStateResult<T>> TryGetStateAsync<T>(string id, TimeSpan timeout)
         {
             var retVal = new GetStateResult<T>();
