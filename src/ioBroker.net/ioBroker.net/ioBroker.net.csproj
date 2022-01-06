@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <Authors>Michael Neu</Authors>
     <Company></Company>
@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SocketIOClient" Version="3.0.3" />
+    <PackageReference Include="SocketIOClient" Version="3.0.4" />
   </ItemGroup>
 
   <ItemGroup>
