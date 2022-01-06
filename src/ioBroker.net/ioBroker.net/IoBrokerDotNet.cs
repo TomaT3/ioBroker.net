@@ -111,7 +111,7 @@ namespace ioBroker.net
 
         public async Task SubscribeStateAsync<T>(string id, Action<T> callback)
         {
-            var cb = new Action<State>((state) => callback(JsonSerializer.Deserialize<T>(state.Val.ToString())));
+            var cb = new Action<State>((state) => callback(state.GetConvertedValue<T>()));
 
             await semaphoreSlim.WaitAsync();
             try
@@ -169,7 +169,7 @@ namespace ioBroker.net
             {
                 try
                 {
-                    stateResult.Value= JsonSerializer.Deserialize<T>(obj.Val.ToString().ToLower());
+                    stateResult.Value= obj.GetConvertedValue<T>();
                     stateResult.Success = true;
                 }
                 catch (Exception e)
