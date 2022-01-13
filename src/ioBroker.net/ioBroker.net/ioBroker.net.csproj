@@ -8,6 +8,7 @@
     <PackageProjectUrl>https://github.com/TomaT3/ioBroker.net</PackageProjectUrl>
     <PackageIcon>ioBrokerIcon.png</PackageIcon>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <RepositoryUrl>https://github.com/TomaT3/ioBroker.net</RepositoryUrl>
     <PackageTags>ioBroker socket communication .net</PackageTags>
@@ -30,6 +31,7 @@
       <PackagePath></PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="..\..\..\README.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
 
   <ItemGroup>
