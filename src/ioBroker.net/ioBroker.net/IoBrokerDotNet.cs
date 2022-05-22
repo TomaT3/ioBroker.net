@@ -189,13 +189,16 @@ namespace ioBroker.net
 
         private void HandleStateChanged(SocketIOResponse response)
         {
-            var topic = response.GetValue<string>();
-            var obj = response.GetValue<State>(1);
-
-            if (_subscriptions.TryGetValue(topic, out List<Action<State>> callbacks))
+            Task.Run(() =>
             {
-                Parallel.ForEach(callbacks, (callbackMethod) => callbackMethod(obj));
-            }
+                var topic = response.GetValue<string>();
+                var obj = response.GetValue<State>(1);
+
+                if (_subscriptions.TryGetValue(topic, out List<Action<State>> callbacks))
+                {
+                    Parallel.ForEach(callbacks, (callbackMethod) => callbackMethod(obj));
+                }
+            });
         }
     }
 }

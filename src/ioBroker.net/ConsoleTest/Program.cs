@@ -14,13 +14,19 @@ namespace ConsoleTest
             //ioBroker.ConnectionString = @"http://192.168.178.192:8084";
             ioBroker.ConnectionString = @"http://iobroker:8084";
             await ioBroker.ConnectAsync(TimeSpan.FromSeconds(5));
-            await ioBroker.SubscribeStateAsync<bool>("linkeddevices.0.motionsensors.gangoben.presence", MotionDetectionChanged);
-            await ioBroker.SubscribeStateAsync<int>("linkeddevices.0.lights.GangOben.level", LightChanged);
-            await ioBroker.SubscribeStateAsync<string>("javascript.0.managers.lights.EgGang.Mode", StringChanged);
 
-            var boolValue = await ioBroker.TryGetStateAsync<bool>("linkeddevices.0.motionsensors.gangoben.presence");
-            var intValue = await ioBroker.TryGetStateAsync<int>("linkeddevices.0.lights.GangOben.level");
-            var stringValue = await ioBroker.TryGetStateAsync<string>("javascript.0.managers.lights.EgGang.Mode");
+            //var res = await ioBroker.TrySetStateAsync<bool>("linkeddevices.0.plugs.luftentfeuchterwaschraum.on", false);
+
+            //var value = await ioBroker.TryGetStateAsync<bool>("linkeddevices.0.plugs.luftentfeuchterwaschraum.on");
+
+
+            await ioBroker.SubscribeStateAsync<bool>("linkeddevices.0.motionsensors.gangoben.presence", async (changedValue) => await MotionDetectionChanged(changedValue, ioBroker));
+            //await ioBroker.SubscribeStateAsync<int>("linkeddevices.0.lights.GangOben.level", LightChanged);
+            //await ioBroker.SubscribeStateAsync<string>("javascript.0.managers.lights.EgGang.Mode", StringChanged);
+
+            //var boolValue = await ioBroker.TryGetStateAsync<bool>("linkeddevices.0.motionsensors.gangoben.presence");
+            //var intValue = await ioBroker.TryGetStateAsync<int>("linkeddevices.0.lights.GangOben.level");
+            //var stringValue = await ioBroker.TryGetStateAsync<string>("javascript.0.managers.lights.EgGang.Mode");
 
 
             //var tempCountId = "javascript.0.socketio.0.Test_12345";
@@ -53,9 +59,14 @@ namespace ConsoleTest
             Console.WriteLine($"StringChanged: {stringChanged}");
         }
 
-        private static void MotionDetectionChanged(bool motionDetected)
+        private static async Task MotionDetectionChanged(bool motionDetected, IoBrokerDotNet ioBrokerDotNet)
         {
             Console.WriteLine($"MotionDetectionChanged: {motionDetected}");
+            var currentValue = await ioBrokerDotNet.TryGetStateAsync<int>("linkeddevices.0.lights.GangOben.level");
+            Console.WriteLine($"CurrentValue error: {currentValue.Error} valueToWrite: {currentValue.Value}");
+
+            var result = await ioBrokerDotNet.TrySetStateAsync<int>("linkeddevices.0.lights.GangOben.level", 10);
+            Console.WriteLine($"SetResult error: {result.Error} valueToWrite: {result.ValueToWrite}");
         }
 
         private static void LightChanged(int lightChanged)
